@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+     <style>
+         #map {
+            height: 380px;
+         }
+     </style>
+    <title>Document</title>
+</head>
+<body>
+    <h1>All the Data in DB</h1>
+    <div><a href="/index.html">Submission Link</a></div>
+    <div id ="map"></div>
+    <script>
+        const map = L.map('map').setView([0, 0], 1);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+        getData();
+        async function getData(){
+            const response = await fetch('/api');
+            const data = await response.json();
+            console.log(data);
+
+            for(item of data){
+                const marker = L.marker([item.lat, item.lon]).addTo(map);
+                const txt = `${item.toSend.city_name}, The weather here at ${item.lat}, ${item.lon} is ${item.toSend.app_temp}°C, with AQI =${item.toSend.aqi}. This was recorded on ${item.toSend.ob_time}`;
+                marker.bindPopup(txt);
+            }
+
+        }
+    </script>
+</body>
+</html>

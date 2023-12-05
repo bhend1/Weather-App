@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Weather App</h1>
+    <div><a href="/all.html">List All</a></div>      
+        The weather here at <span id="latitude"></span>&deg;,
+        <span id="longitude"></span>&deg; is <span id="summary"></span> with
+        a temperature of <span id="temp"></span>&deg; C. The concentration of
+        particulate matter (<span id="aq_parameter"></span>) is
+        <span id="aq_value"></span> <span id="aq_units"></span> last read on
+        <span id="aq_date"></span>.
+      </p>
+    
+
+    <button id="submit">Submit</button>
+    <script>
+
+      if ("geolocation" in navigator) {
+        console.log("geolocation available");
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          lat = position.coords.latitude;
+          lon = position.coords.longitude;
+          document.getElementById("latitude").textContent = lat;
+          document.getElementById("longitude").textContent = lon;
+          const api_url = `/weather/${lat}, ${lon}`;
+          const response = await fetch(api_url);
+          const json = await response.json();
+          document.getElementById('summary').textContent = await json.data[0].weather.description;
+          document.getElementById('temp').textContent = await json.data[0].app_temp;
+          document.getElementById('aq_parameter').textContent = await json.data[0].aqi;
+          document.getElementById('aq_date').textContent = await json.data[0].ob_time;
+          console.log(json);
+          const button = document.getElementById("submit");
+          button.addEventListener("click", async (event) => {
+          const toSend = await json.data[0];
+          const data = {lat, lon, toSend};
+          console.log(data);
+          const options = {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+
+          } 
+          const db_response = await fetch('/api', options);
+          const db_json = await db_response.json();
+        });
+        });
+      } else {
+        console.log("geolocation not available");
+      }
+    </script>
+  </body>
+</html>
